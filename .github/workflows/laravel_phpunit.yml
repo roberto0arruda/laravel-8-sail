@@ -1,0 +1,32 @@
+name: Laravel Test
+
+on:
+  push:
+    branches:
+      - 'main'
+      - 'feature/**'
+      - 'develop'
+
+jobs:
+  # Label of the job
+  laravel-tests-with-db:
+    name: Laravel run tests
+    # Containers must run in Linux based operating systems
+    runs-on: ubuntu-latest
+
+    steps:
+      # Downloads a copy of the code in your repository before running CI tests
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Laravel Setup - Install Dependencies
+        run: composer install -q --no-ansi --no-interaction --no-scripts --prefer-dist
+
+      - name: Copy .env
+        run: php -r "file_exists('.env') || copy('.env.example', '.env');"
+
+      - name: Generate key
+        run: php artisan key:generate
+
+      - name: Execute tests (Unit and Feature tests) via PHPUnit
+        run: php artisan test
